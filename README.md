@@ -1,6 +1,6 @@
 # NextStep-jwp
 
-<img src=https://i.imgur.com/7auQz8Z.png><br>
+<img src="https://i.imgur.com/7auQz8Z.png" alt="Your image title" width="400"/><br>
 
 > NextStep의 [만들면서 배우는 스프링](https://edu.nextstep.camp/c/8fWRxNWU/) 3 기 기간 중 수행한 모든 프로젝트를 기록으로 남긴다.
 
