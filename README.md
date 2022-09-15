@@ -2,7 +2,7 @@
 
 <img src="https://i.imgur.com/7auQz8Z.png" alt="Your image title" width="400"/><br>
 
-> NextStep의 [만들면서 배우는 스프링](https://edu.nextstep.camp/c/8fWRxNWU/) 3 기 기간 중 수행한 모든 프로젝트를 기록으로 남긴다.
+> NextStep의 [만들면서 배우는 스프링](https://edu.nextstep.camp/c/4YUvqn9V/) 3 기 기간 중 수행한 모든 프로젝트를 기록으로 남긴다.
 
 * 기간 : ``2022.07.18 - 2022.09.29``
 
@@ -15,7 +15,7 @@
 |:---:|:------------------:|:---------------------------------------------------------------------:|:---|
 | 1 |       DI 구현        |    [jwp-di-step1](https://github.com/headF1rst/jwp-di/tree/step1)     | [Pull Request](https://github.com/next-step/jwp-di/pull/129) |
 | 2 |     DI 구현(힌트)      |    [jwp-di-step2](https://github.com/headF1rst/jwp-di/tree/step2)     | [Pull Request](https://github.com/next-step/jwp-di/pull/132) |
-| 3 |  @Configuraation   | [jwp-di-step3]() | [Pull Request]() |
+| 3 |  @Configuration   | [jwp-di-step3]() | [Pull Request]() |
 | 4 | @Configuration(힌트) | [jwp-di-step4]() | [Pull Request]() |
 
 <br>
