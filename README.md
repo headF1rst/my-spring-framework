@@ -15,7 +15,7 @@
 |:---:|:------------------:|:---------------------------------------------------------------------:|:---|
 | 1 |       DI 구현        |    [jwp-di-step1](https://github.com/headF1rst/jwp-di/tree/step1)     | [Pull Request](https://github.com/next-step/jwp-di/pull/129) |
 | 2 |     DI 구현(힌트)      |    [jwp-di-step2](https://github.com/headF1rst/jwp-di/tree/step2)     | [Pull Request](https://github.com/next-step/jwp-di/pull/132) |
-| 3 |  @Configuration   | 진행중 | 진행중 |
+| 3 |  @Configuration   | [jwp-di-step3](https://github.com/headF1rst/jwp-di/tree/step3) | [Pull Request](https://github.com/next-step/jwp-di/pull/149) |
 | 4 | @Configuration(힌트) | 진행중 | 진행중 |
 
 <br>
