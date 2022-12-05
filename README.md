@@ -1,4 +1,4 @@
-# NextStep-jwp
+# my-spring-framework
 
 <img src="https://i.imgur.com/7auQz8Z.png" alt="Your image title" width="400"/><br>
 
