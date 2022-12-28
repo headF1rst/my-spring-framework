@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/jwp-di" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/jwp-jdbc" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/jwp-mvc" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/jwp-was" vcs="Git" />
