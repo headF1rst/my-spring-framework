@@ -12,11 +12,10 @@ import org.springframework.web.client.RestTemplate;
 import webserver.ExecutorsTest;
 
 import java.io.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -77,27 +76,109 @@ public class HttpRequestTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
-    @DisplayName("설정된 쓰레드풀 보다 많은 파일 요청에도 정상 동작")
+    @DisplayName("서버의 최대 Thread Pool 수만큼 요청을 보낸다.")
     @Test
-    void request_index_html_at_the_same_time() throws InterruptedException {
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
-        CountDownLatch latch = new CountDownLatch(100);
+    void request_maximum_threads() throws InterruptedException {
+        final int threadPoolSize = 350;
+        final int requestCount = 300;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        CountDownLatch latch = new CountDownLatch(requestCount);
         RestTemplate restTemplate = new RestTemplate();
-        AtomicInteger counter = new AtomicInteger(0);
-        StopWatch sw = new StopWatch();
-        sw.start();
 
-        for (int i = 0; i < 100; i++) {
+        for (int count = 0; count < requestCount; count++) {
             executorService.execute(() -> {
+                restTemplate.getForEntity("http://localhost:8080/index.html", String.class);
                 latch.countDown();
-                int index = counter.addAndGet(1);
-                restTemplate.getForEntity("http://localhost:8080", String.class);
-                logger.info("Thread '{}'", index);
             });
         }
-        sw.stop();
-        executorService.shutdown();
-        latch.await(100, TimeUnit.MILLISECONDS);
-        logger.info("Total Elapsed: '{}'", sw.getTotalTimeMillis());
+        boolean await = latch.await(10000, TimeUnit.MILLISECONDS);
+
+        assertAll(
+                () -> assertThat(latch.getCount()).isZero(),
+                () -> assertThat(await).isTrue()
+        );
+    }
+
+    @DisplayName("서버의 최대 Thread Pool 수보다 더 많은 요청을 보낸다.")
+    @Test
+    void request_more_than_maximum_threads() throws InterruptedException {
+        final int threadPoolSize = 350;
+        final int requestCount = 500;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        CountDownLatch latch = new CountDownLatch(requestCount);
+        RestTemplate restTemplate = new RestTemplate();
+
+        for (int count = 0; count < requestCount; count++) {
+            executorService.execute(() -> {
+                restTemplate.getForEntity("http://localhost:8080/index.html", String.class);
+                latch.countDown();
+            });
+        }
+        boolean await = latch.await(10000, TimeUnit.MILLISECONDS);
+
+        assertAll(
+                () -> assertThat(latch.getCount()).isNotZero(),
+                () -> assertThat(await).isFalse()
+        );
+    }
+
+    @DisplayName("서버가 수용하는 최대 스레드풀 이하로 요청을 보내본다. ")
+    @Test
+    void requestUnderMaxThreadSize() throws InterruptedException {
+        int threadPoolSize = 200;
+        int requestCount = 100;
+        CountDownLatch countDownLatch = new CountDownLatch(requestCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start();
+        IntStream.range(0, requestCount).parallel()
+                .forEach(n -> executorService.execute(() -> {
+                    RestTemplate restTemplate = new RestTemplate();
+                    ResponseEntity<String> response =
+                            restTemplate.getForEntity("http://localhost:8080/index.html", String.class);
+                    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+                    logger.debug("Thread - {}", Thread.currentThread());
+                    countDownLatch.countDown();
+                }
+        ));
+        boolean await = countDownLatch.await(10000, TimeUnit.MILLISECONDS);
+        stopWatch.stop();
+
+        System.out.println("stopWatch.getTotalTimeSeconds() = " + stopWatch.getTotalTimeSeconds());
+        assertAll(
+                () -> assertThat(countDownLatch.getCount()).isZero(),
+                () -> assertThat(await).isTrue()
+        );
+    }
+
+    @DisplayName("서버가 수용하는 최대 스레드풀 이상으로 요청을 보내본다. ")
+    @Test
+    void requestOverMaxThreadSize() throws InterruptedException {
+        int threadPoolSize = 200;
+        int requestCount = 400;
+        CountDownLatch countDownLatch = new CountDownLatch(requestCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start();
+        IntStream.range(0, requestCount).parallel()
+                .forEach(n -> executorService.execute(() -> {
+                            RestTemplate restTemplate = new RestTemplate();
+                            ResponseEntity<String> response =
+                                    restTemplate.getForEntity("http://localhost:8080/index.html", String.class);
+                            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+                            logger.debug("Thread - {}", Thread.currentThread());
+                            countDownLatch.countDown();
+                        }
+                ));
+        boolean await = countDownLatch.await(10000, TimeUnit.MILLISECONDS);
+        stopWatch.stop();
+
+        System.out.println("stopWatch.getTotalTimeSeconds() = " + stopWatch.getTotalTimeSeconds());
+        assertAll(
+                () -> assertThat(countDownLatch.getCount()).isZero(),
+                () -> assertThat(await).isTrue()
+        );
     }
 }
